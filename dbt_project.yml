@@ -1,0 +1,2 @@
+name: "scms_poc"
+profile: "scms_poc" # ✅ THIS must match the key in profiles.yml exactly

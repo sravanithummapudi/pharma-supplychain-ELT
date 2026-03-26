@@ -1,0 +1,119 @@
+version: 2
+
+models:
+  - name: scms_merged_model
+    description: >
+      Final cleaned and enriched model for the SCMS dataset.
+      Includes grouped median imputation, data type standardization,
+      PII masking, null value handling, and derived delivery lag and value_per_kg.
+    columns:
+      - name: id
+        description: Unique identifier for each record
+        tests:
+          - not_null
+          - unique
+
+      - name: country
+        description: Country receiving the shipment
+        tests:
+          - not_null
+
+      - name: shipment_mode
+        description: Mode of shipment (Air, Sea, NA, etc.)
+        tests:
+          - not_null
+
+      - name: Weight_in_Kg
+        description: Cleaned and imputed weight of shipment in kilograms
+        tests:
+          - not_null
+
+      - name: Freight_Cost_in_USD
+        description: Cleaned and imputed freight cost in USD
+        tests:
+          - not_null
+
+      - name: line_item_value
+        description: Value of the line item, used in deriving value_per_kg
+
+      - name: line_item_insurance_usd
+        description: Insurance cost per line item, defaulted to 0 if missing
+
+      - name: Contact_Number
+        description: Masked contact number
+        tests:
+          - not_null
+
+      - name: Contact_Email
+        description: Masked contact email
+        tests:
+          - not_null
+
+      - name: Contact_Name
+        description: Masked contact name
+
+      - name: scheduled_delivery_date
+        description: Scheduled delivery date for the item
+
+      - name: delivered_to_client_date
+        description: Actual delivery date recorded
+
+      - name: delivery_lag
+        description: Number of days delayed from scheduled to actual delivery
+        tests:
+          - not_null
+          - dbt_utils.accepted_range:
+              min_value: 0
+              max_value: 365
+
+      - name: value_per_kg
+        description: Line item value per kilogram, safely derived using line_item_value and weight
+        tests:
+          - not_null
+
+  - name: scms_summary_model
+    description: >
+      Aggregated summary of SCMS supply chain metrics for dashboarding.
+      Includes delivery performance, shipping cost, product group, vendor, and brand-level KPIs.
+    columns:
+      - name: country
+        description: Country receiving the shipment
+        tests:
+          - not_null
+
+      - name: shipment_mode
+        description: Mode of shipment (Air, Sea, NA, etc.)
+        tests:
+          - not_null
+
+      - name: vendor
+        description: Vendor name for the shipment
+        tests:
+          - not_null
+
+      - name: product_group
+        description: Main category of the shipped product
+
+      - name: brand
+        description: Brand name (if any)
+
+      - name: total_shipments
+        description: Count of shipment records grouped by the dimensions
+
+      - name: total_quantity
+        description: Total quantity of items shipped
+
+      - name: total_value_usd
+        description: Total value of the line items in USD
+
+      - name: avg_value_per_kg
+        description: Average value per kilogram shipped
+
+      - name: avg_delivery_lag
+        description: Average delivery delay in days (actual vs scheduled)
+
+      - name: avg_weight_kg
+        description: Average shipment weight in kilograms
+
+      - name: avg_freight_cost_usd
+        description: Average freight cost in USD per shipment

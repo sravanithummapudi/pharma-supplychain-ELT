@@ -1,0 +1,65 @@
+version: 2
+
+models:
+  - name: scms_clean_model
+    description: >
+      This model contains cleaned pharmaceutical delivery data,
+      including masked PII (Aadhaar, DOB, Phone, Email), calculated metrics
+      such as delivery lag and value per kg, and filtered rows for analysis readiness.
+    columns:
+      - name: id
+        description: "Primary key for each delivery record"
+        tests:
+          - not_null
+          - unique
+
+      - name: country
+        description: "Country of delivery"
+        tests:
+          - not_null
+
+      - name: shipment_mode
+        description: "Mode of shipment (e.g., Air, Sea, Land)"
+        tests:
+          - not_null
+
+      - name: delivery_lag
+        description: >
+          Days between scheduled and actual delivery. A negative value indicates early delivery,
+          while a value greater than 365 signals long delays.
+        tests:
+          - not_null
+          - dbt_utils.accepted_range:
+              min_value: 0
+              max_value: 365
+
+      - name: value_per_kg
+        description: "Monetary value of the shipment per kilogram (USD/kg)"
+        tests:
+          - not_null
+          - dbt_utils.accepted_range:
+              min_value: 0
+
+  - name: scms_summary_model
+    description: >
+      Aggregated summary by country and shipment mode,
+      showing count of deliveries, average delivery lag, total value,
+      and average value per kg to support performance analysis and dashboarding.
+    columns:
+      - name: country
+        description: "Country of delivery"
+
+      - name: shipment_mode
+        description: "Mode of shipment"
+
+      - name: total_shipments
+        description: "Total number of deliveries for this group"
+
+      - name: avg_delivery_lag
+        description: "Average delivery delay or early delivery days"
+
+      - name: total_value
+        description: "Sum of all line item values (USD)"
+
+      - name: avg_value_per_kg
+        description: "Average value per kg for this shipment group"
