@@ -15,12 +15,14 @@ This project implements a modern **ELT data pipeline** using dbt, BigQuery, and 
 ---
 
 ## 📁 Project Structure
+```text
 pharma_poc/
-├── models/ # dbt models (staging, marts)
-├── data/ # raw datasets
-├── enrich_pii_dataset.py # data generation & enrichment script
-├── packages.yml # dbt packages
+├── models/                  # dbt models (staging, marts)
+├── data/                    # raw datasets
+├── enrich_pii_dataset.py    # data generation & enrichment script
+├── packages.yml             # dbt packages
 ├── README.md
+```
 
 ## 🔑 Key Features
 - Implemented **PII masking** (Aadhaar, DOB, Phone, Email) for data privacy  
